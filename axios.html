@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>axios</title>
+</head>
+<body>
+  <button onclick="testGet()">get</button>
+  <button onclick="testPost()">post</button>
+  <button onclick="testPut()">put</button>
+  <button onclick="testDelete()">delete</button>
+
+  <script>
+    function axios({
+      url,
+      method = 'GET',
+      params = {},
+      data = {}
+    }) {
+      return new Promise((resolve, reject) => {
+        let supfix = Object.keys(params).reduce((total, current) => {
+        return `${total}${current}=${params[current]}&`
+      }, '?')
+        url = supfix.length > 1 ? url + supfix.slice(0, -1) : url
+
+        const xhr = new XMLHttpRequest()
+        xhr.open(method, url, true)
+        if (/(^get$)|(^delete$)/i.test(method)) {
+          xhr.send()
+        } else {
+          xhr.setRequestHeader('content-type', 'application/json; charset=utf-8')
+          xhr.send(JSON.stringify(data))
+        }
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4) {
+            const {statusText, status} = xhr
+            if (status <= 300 && status >= 200) {
+              resolve({
+                data: JSON.parse(xhr.response),
+                status,
+                statusText
+              })
+            } else {
+              reject(new Error('ÍøÂçÇëÇó¹ÊÕÏ#######' + status))
+            }
+          }
+        }
+      })
+    }
+
+    function testGet() {
+      axios({
+        url: 'http://localhost:3000/posts',
+        params: {
+          id: 4
+        }
+      }).then(
+        res => console.log(res),
+        err => alert(err.message)
+      )
+    }
+
+    function testPost() {
+      axios({
+        url: ' http://localhost:3000/posts',
+        method: 'post',
+        data: {
+          title: 'XXXXX',
+          author: '#####',
+          id: 88
+        }
+      }).then(
+        res => console.log(res),
+        err => alert(err.message)
+      )
+
+    }
+
+    function testPut() {
+      axios({
+        url: 'http://localhost:3000/posts/1',
+        method: 'put',
+        data: {
+          title: 'ttttt',
+          author: 'ppppp'
+        }
+      }).then(
+        res => console.log(res),
+        err => alert(err.message)
+      )
+
+    }
+
+    function testDelete() {
+
+    }
+  </script>
+</body>
+</html>
